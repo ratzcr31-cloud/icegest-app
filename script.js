@@ -357,9 +357,23 @@ function editarItem(id) {
 }
 
 async function salvarItem(e) { 
-    e.preventDefault(); const id = document.getElementById("idItem").value; 
+    e.preventDefault(); 
+    const id = document.getElementById("idItem").value; 
+    
+    // 💡 TRUQUE: Congelamos o botão para impedir duplo-clique acidental
+    const btnSalvar = e.target.querySelector('button[type="submit"]') || document.activeElement;
+    if (btnSalvar) {
+        btnSalvar.disabled = true;
+        btnSalvar.innerText = "A guardar...";
+    }
+
     if (id === "MASSA") {
-        const novaCategoria = document.getElementById("categoriaItem").value; const novoSetor = document.getElementById("setorItem").value; const novoEstoque = document.getElementById("estoqueItem").value; const novaUnidade = document.getElementById("unidadeItem").value; const novaValidade = document.getElementById("validadeItem").value;
+        // ... (resto do teu código de massa mantém-se igual)
+        const novaCategoria = document.getElementById("categoriaItem").value; 
+        const novoSetor = document.getElementById("setorItem").value; 
+        const novoEstoque = document.getElementById("estoqueItem").value; 
+        const novaUnidade = document.getElementById("unidadeItem").value; 
+        const novaValidade = document.getElementById("validadeItem").value;
         try {
             const promessas = edicaoEmMassaIds.map(itemId => {
                 const itemAtual = estoque.find(x => x.id === itemId); if (!itemAtual) return Promise.resolve();
@@ -369,17 +383,36 @@ async function salvarItem(e) {
             });
             const respostas = await Promise.all(promessas); respostas.forEach(tratarErroAuth);
             document.getElementById('checkTodos').checked = false; verificarBotoesMassa(); fecharModal(); carregarEstoque();
-        } catch (erro) { if(erro.message !== "Não autorizado") alert("Erro ao salvar edições em massa!"); }
+        } catch (erro) { 
+            if(erro.message !== "Não autorizado") alert("Erro ao salvar edições em massa!"); 
+        } finally {
+            if (btnSalvar) { btnSalvar.disabled = false; btnSalvar.innerText = "Salvar"; }
+        }
         return;
     }
 
     let categoriaSelecionada = document.getElementById("categoriaItem").value; if (!categoriaSelecionada || categoriaSelecionada.trim() === "") categoriaSelecionada = "Default";
     const dados = { item: document.getElementById("nomeItem").value, categoria: categoriaSelecionada, setor: document.getElementById("setorItem").value, unidade: document.getElementById("unidadeItem").value, estInicial: document.getElementById("estoqueItem").value, estFinal: document.getElementById("estoqueItem").value, validade: document.getElementById("validadeItem").value, observacao: document.getElementById("obsItem") ? document.getElementById("obsItem").value : "", imagemUrl: document.getElementById("imagemItem") ? document.getElementById("imagemItem").value : "" }; 
+    
     try { 
-        let resposta; if (id) { resposta = await fetch(`${API_URL}/estoque/${id}`, { method: 'PUT', headers: getAuthHeaders(), body: JSON.stringify(dados) }); } else { resposta = await fetch(API_URL + '/estoque', { method: 'POST', headers: getAuthHeaders(), body: JSON.stringify(dados) }); }
-        tratarErroAuth(resposta); if (!resposta.ok) { const erroServidor = await resposta.json(); alert("Atenção! Erro no servidor: " + erroServidor.error); return; }
-        fecharModal(); carregarEstoque(); 
-    } catch (erro) { if(erro.message !== "Não autorizado") alert(`Erro de comunicação com o servidor!`); } 
+        let resposta; 
+        if (id) { 
+            resposta = await fetch(`${API_URL}/estoque/${id}`, { method: 'PUT', headers: getAuthHeaders(), body: JSON.stringify(dados) }); 
+        } else { 
+            resposta = await fetch(API_URL + '/estoque', { method: 'POST', headers: getAuthHeaders(), body: JSON.stringify(dados) }); 
+        }
+        tratarErroAuth(resposta); 
+        if (!resposta.ok) { 
+            const erroServidor = await resposta.json(); alert("Atenção! Erro no servidor: " + erroServidor.error); return; 
+        }
+        fecharModal(); 
+        carregarEstoque(); 
+    } catch (erro) { 
+        if(erro.message !== "Não autorizado") alert(`Erro de comunicação com o servidor!`); 
+    } finally {
+        // 💡 Devolvemos a vida ao botão caso haja um erro ou o utilizador abra o modal de novo
+        if (btnSalvar) { btnSalvar.disabled = false; btnSalvar.innerText = "Salvar"; }
+    }
 }
 
 async function deletarItem(id) { if(confirm("Apagar?")) { const res = await fetch(`${API_URL}/estoque/${id}`, { method: 'DELETE', headers: getAuthHeaders() }); tratarErroAuth(res); carregarEstoque(); } }
