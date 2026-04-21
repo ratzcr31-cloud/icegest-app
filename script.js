@@ -292,15 +292,63 @@ function verificarBotoesMassa() {
     if(checkboxes.length > 0) { btnApagar.style.display = 'inline-block'; btnApagar.innerHTML = `${icones.apagar} Apagar ${checkboxes.length}`; btnImprimir.style.display = 'inline-block'; btnImprimir.innerHTML = `${icones.imprimir} Etiquetas`; } else { btnApagar.style.display = 'none'; document.getElementById('checkTodos').checked = false; btnImprimir.style.display = 'none'; }
 }
 
+// ==========================================
+// APAGAR EM MASSA (Selecionados)
+// ==========================================
 async function apagarSelecionados() {
-    const checkboxes = document.querySelectorAll('.check-item:checked'); if (checkboxes.length === 0) return;
-    if(confirm(`Tem certeza absoluta que deseja apagar ${checkboxes.length} item(ns)?`)) {
-        try {
-            const promessas = Array.from(checkboxes).map(cb => fetch(`${API_URL}/estoque/${cb.value}`, { method: 'DELETE', headers: getAuthHeaders() }));
-            const respostas = await Promise.all(promessas); respostas.forEach(tratarErroAuth);
-            document.getElementById('checkTodos').checked = false; verificarBotoesMassa(); carregarEstoque();
-        } catch (error) { if(error.message !== "Não autorizado") alert("Ocorreu um erro ao apagar alguns itens."); }
-    }
+    const checkboxes = document.querySelectorAll('.check-item:checked');
+    if (checkboxes.length === 0) return;
+
+    Swal.fire({
+        title: `Apagar ${checkboxes.length} itens?`,
+        text: "Esta ação não pode ser desfeita e removerá todos os produtos selecionados!",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#d33',
+        cancelButtonColor: '#3085d6',
+        confirmButtonText: `Sim, apagar todos!`,
+        cancelButtonText: 'Cancelar',
+        background: configPrefs.escuro ? '#2d2d2d' : '#fff',
+        color: configPrefs.escuro ? '#fff' : '#333'
+    }).then(async (result) => {
+        if (result.isConfirmed) {
+            // Mostrar um alerta de "A processar..." enquanto apaga muitos itens
+            Swal.fire({
+                title: 'A apagar...',
+                html: 'Por favor, aguarde um momento.',
+                allowOutsideClick: false,
+                didOpen: () => { Swal.showLoading(); },
+                background: configPrefs.escuro ? '#2d2d2d' : '#fff',
+                color: configPrefs.escuro ? '#fff' : '#333'
+            });
+
+            try {
+                const promessas = Array.from(checkboxes).map(cb => 
+                    fetch(`${API_URL}/estoque/${cb.value}`, { method: 'DELETE', headers: getAuthHeaders() })
+                );
+                const respostas = await Promise.all(promessas);
+                respostas.forEach(tratarErroAuth);
+
+                document.getElementById('checkTodos').checked = false;
+                verificarBotoesMassa();
+                await carregarEstoque();
+
+                Swal.fire({
+                    title: 'Sucesso!',
+                    text: `${checkboxes.length} itens foram removidos do sistema.`,
+                    icon: 'success',
+                    timer: 2000,
+                    showConfirmButton: false,
+                    background: configPrefs.escuro ? '#2d2d2d' : '#fff',
+                    color: configPrefs.escuro ? '#fff' : '#333'
+                });
+            } catch (error) {
+                if(error.message !== "Não autorizado") {
+                    Swal.fire('Erro!', 'Ocorreu um problema ao apagar os itens selecionados.', 'error');
+                }
+            }
+        }
+    });
 }
 
 function prepararSelectsMassa() {
@@ -415,8 +463,48 @@ async function salvarItem(e) {
     }
 }
 
-async function deletarItem(id) { if(confirm("Apagar?")) { const res = await fetch(`${API_URL}/estoque/${id}`, { method: 'DELETE', headers: getAuthHeaders() }); tratarErroAuth(res); carregarEstoque(); } }
+// ==========================================
+// APAGAR ITEM ÚNICO (Tabela de Estoque)
+// ==========================================
+async function deletarItem(id) {
+    const produto = estoque.find(p => p.id === id);
+    const nomeItem = produto ? produto.item : "este item";
 
+    Swal.fire({
+        title: 'Apagar Produto?',
+        text: `Tem a certeza que deseja remover "${nomeItem}" do stock?`,
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#d33',
+        cancelButtonColor: '#3085d6',
+        confirmButtonText: 'Sim, apagar!',
+        cancelButtonText: 'Cancelar',
+        background: configPrefs.escuro ? '#2d2d2d' : '#fff',
+        color: configPrefs.escuro ? '#fff' : '#333'
+    }).then(async (result) => {
+        if (result.isConfirmed) {
+            try {
+                const res = await fetch(`${API_URL}/estoque/${id}`, { method: 'DELETE', headers: getAuthHeaders() });
+                tratarErroAuth(res);
+                carregarEstoque();
+                
+                Swal.fire({
+                    title: 'Removido!',
+                    text: 'O item foi excluído com sucesso.',
+                    icon: 'success',
+                    timer: 1500,
+                    showConfirmButton: false,
+                    background: configPrefs.escuro ? '#2d2d2d' : '#fff',
+                    color: configPrefs.escuro ? '#fff' : '#333'
+                });
+            } catch (error) {
+                if(error.message !== "Não autorizado") {
+                    Swal.fire('Erro!', 'Não foi possível comunicar com o servidor.', 'error');
+                }
+            }
+        }
+    });
+}
 function filtrarTabelaSetor(s, el) { document.querySelectorAll('.abas .aba').forEach(a => a.classList.remove('active')); el.classList.add('active'); filtroSetorAtual = s; atualizarTabela(); }
 
 function atualizarTabela() {
