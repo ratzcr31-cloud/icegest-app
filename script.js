@@ -255,7 +255,41 @@ function mudarAbaMenu(el, tela) {
 
 function carregarChatIA() { const chatSalvo = localStorage.getItem('iceGest_chatIA'); document.getElementById('chatHistorico').innerHTML = chatSalvo ? chatSalvo : chatPadraoHTML; const chatEl = document.getElementById("chatHistorico"); chatEl.scrollTop = chatEl.scrollHeight; }
 function salvarChatIA() { const html = document.getElementById('chatHistorico').innerHTML; localStorage.setItem('iceGest_chatIA', html); }
-function limparChatIA() { if(confirm("Tem a certeza que deseja limpar o histórico com a Aurora?")) { localStorage.removeItem('iceGest_chatIA'); document.getElementById('chatHistorico').innerHTML = chatPadraoHTML; } }
+// ==========================================
+// LIMPAR CHAT DA AURORA (SweetAlert2)
+// ==========================================
+function limparChatIA() { 
+    Swal.fire({
+        title: 'Limpar Conversa?',
+        text: 'Tem a certeza que deseja apagar todo o histórico com a Aurora?',
+        icon: 'question',
+        showCancelButton: true,
+        confirmButtonColor: '#d33',
+        cancelButtonColor: '#3085d6',
+        confirmButtonText: 'Sim, limpar!',
+        cancelButtonText: 'Cancelar',
+        background: configPrefs.escuro ? '#2d2d2d' : '#fff',
+        color: configPrefs.escuro ? '#fff' : '#333'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            
+            // A tua lógica original exata que limpa o chat e a memória!
+            localStorage.removeItem('iceGest_chatIA'); 
+            document.getElementById('chatHistorico').innerHTML = chatPadraoHTML;
+
+            // O Check verde de sucesso que desaparece sozinho
+            Swal.fire({
+                title: 'Limpo!',
+                text: 'A conversa com a Aurora foi apagada.',
+                icon: 'success',
+                timer: 1500,
+                showConfirmButton: false,
+                background: configPrefs.escuro ? '#2d2d2d' : '#fff',
+                color: configPrefs.escuro ? '#fff' : '#333'
+            });
+        }
+    });
+}
 
 async function enviarParaIA() { 
     const inputPergunta = document.getElementById("perguntaIAReal"); const inputImagem = document.getElementById("imagemIA"); const btn = document.getElementById("btnEnviarIA"); const chat = document.getElementById("chatHistorico"); 
