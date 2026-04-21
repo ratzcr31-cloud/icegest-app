@@ -6,7 +6,6 @@ body.dark-mode th { color: #ffffff; background-color: #111827; }
 body.dark-mode .aba { color: #9CA3AF; } 
 body.dark-mode .aba.active { color: #60A5FA; border-bottom-color: #60A5FA; }
 body.dark-mode .close-btn { color: #F9FAFB; }
-/* 💡 NOVO: Garante que os inputs no modo escuro têm fundo escuro e texto claro */
 body.dark-mode input, body.dark-mode select, body.dark-mode textarea { background-color: #0F172A; color: #F9FAFB; border-color: #4B5563; }
 body.large-font { --tamanho-fonte: 18px; } 
 
@@ -15,10 +14,10 @@ body {
     background-color: var(--fundo); 
     background-image: var(--bg-img, none); 
     background-size: cover;                
-    background-position: center;           
+    background-position: center;            
     background-attachment: fixed;          
     color: var(--texto); 
-    display: block; /* 💡 MUDÁMOS DE FLEX PARA BLOCK */
+    display: block; 
     width: 100vw; 
     height: 100vh; 
     margin: 0;
@@ -26,6 +25,11 @@ body {
     overflow: hidden; 
     transition: background-color 0.3s, color 0.3s, background-image 0.5s; 
     font-size: var(--tamanho-fonte); 
+}
+
+/* 💡 BOTÃO FLUTUANTE (Fica invisível no computador) */
+.btn-menu-mobile {
+    display: none; 
 }
 
 /* TELA DE LOGIN */
@@ -43,14 +47,14 @@ body {
 .link-auth:hover { color: #1f639e; }
 
 #app-completo { 
-    display: none; /* O JS muda isto para 'flex' ao fazer login */
-    width: 100vw;  /* 💡 FORÇA 100% DA LARGURA DA TELA */
-    height: 100vh; /* 💡 FORÇA 100% DA ALTURA DA TELA */
+    display: none; 
+    width: 100vw;  
+    height: 100vh; 
     position: relative; 
 }
 
 .main-container { 
-    flex: 1; /* Garante que o lado direito ocupa todo o espaço que sobra */
+    flex: 1; 
     display: flex; 
     flex-direction: column; 
     overflow-y: auto; 
@@ -71,39 +75,80 @@ body {
 
 .sidebar { display: flex; width: 260px; flex-shrink: 0; background-color: var(--bg-card); border-right: 1px solid var(--borda); padding: 20px; flex-direction: column; gap: 15px; transition: width 0.3s ease, padding 0.3s ease; overflow-x: hidden; }
 
-/* A barra lateral recolhida */
 .sidebar.recolhida { width: 85px; align-items: center; padding: 20px 10px; }
 .sidebar.recolhida .logo-text, .sidebar.recolhida .menu-text { display: none; }
-
-/* 💡 CORREÇÃO 1: Centraliza o botão e o gelado verticalmente */
 .sidebar.recolhida .logo-container { border-bottom: none; padding-bottom: 0; justify-content: center; align-items: center; flex-direction: column-reverse; gap: 20px; width: 100%; margin-bottom: 15px; }
 .sidebar.recolhida .toggle-desktop { transform: rotate(180deg); margin: 0 auto; }
-
-/* 💡 CORREÇÃO 2: Força os ícones a ficarem exatamente no centro do bloco azul (quando ativo) */
 .sidebar.recolhida .menu-item { justify-content: center; padding: 12px 0; width: 100%; }
 
 .menu-item { display: flex; align-items: center; gap: 12px; padding: 12px; border-radius: 8px; cursor: pointer; transition: 0.3s; font-weight: 600; white-space: nowrap; width: 100%; }
-
-/* 💡 CORREÇÃO 3: Dá um tamanho fixo aos ícones, assim os textos à direita ficam todos alinhados numa linha perfeita na barra expandida */
 .menu-icon { font-size: 18px; width: 25px; text-align: center; display: inline-block; }
-
 .menu-item:hover, .menu-item.active { background-color: var(--azul-claro); color: var(--azul-primario); }
 
-/* MODO MOBILE */
+/* ========================================================
+   📱 MODO MOBILE (A MAGIA ACONTECE AQUI!)
+======================================================== */
 @media (max-width: 768px) {
-    .menu-toggle { display: block; }
+    /* 1. Ativa o Botão Flutuante e esconde o antigo */
+    .btn-menu-mobile { 
+        display: flex; 
+        align-items: center;
+        justify-content: center;
+        position: fixed;
+        bottom: 20px;
+        left: 20px;
+        background-color: var(--azul-primario);
+        color: white;
+        border: none;
+        border-radius: 50%;
+        width: 60px;
+        height: 60px;
+        font-size: 28px;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+        z-index: 9999;
+        cursor: pointer;
+    }
+    .menu-toggle { display: none !important; }
+
+    /* 2. Comportamento do Menu Lateral */
     .sidebar { position: fixed; left: -260px; top: 0; height: 100%; z-index: 1000; box-shadow: 2px 0 10px rgba(0,0,0,0.3); }
     .sidebar.aberta { left: 0; }
     .menu-overlay.aberta { display: block; }
-    .acoes-esquerda, .acoes-direita { width: 100%; justify-content: flex-start; }
-    .acoes-direita { margin-left: 0; margin-top: 10px; }
+
+    /* 3. Correção do Topo (Exportar/Usuário e Pesquisa/Filtros) */
+    .topbar { padding-top: 55px; } /* Dá espaço para os botões lá no topo */
+    
+    .acoes-direita { 
+        position: absolute; 
+        top: 15px; 
+        right: 15px; 
+        width: auto; 
+        margin: 0; 
+        justify-content: flex-end; 
+    }
+    #btn-main-export { padding: 5px 10px; font-size: 12px; }
+
+    .acoes-esquerda { 
+        flex-direction: column; 
+        width: 100%; 
+        justify-content: stretch; 
+        margin-top: 10px;
+    }
+    .acoes-esquerda > input, 
+    .acoes-esquerda > select, 
+    .acoes-esquerda > button { 
+        width: 100%; 
+    }
     .barra-pesquisa { width: 100%; }
+
+    /* 4. Correções da Aurora no Telemóvel */
     .tela-ia-container { flex-direction: column !important; height: auto !important; }
     .aurora-container { width: 100%; flex-direction: row; justify-content: center; margin-bottom: -20px; z-index: 2; }
     .aurora-avatar { width: 80px; height: 80px; }
     .aurora-status { margin-top: 0; margin-left: -15px; }
     #chatHistorico { height: 400px !important; margin-top: 10px;}
 }
+/* ======================================================== */
 
 .topbar { display: flex; flex-direction: column; align-items: flex-start; padding: 15px 20px; background-color: var(--bg-card); border-bottom: 1px solid var(--borda); gap: 15px; position: relative; z-index: 50; }
 .abas { display: flex; align-items: center; flex-wrap: wrap; width: 100%; border-bottom: 1px solid var(--borda); padding-bottom: 5px;}
@@ -140,23 +185,10 @@ body {
 .boas-vindas { background: linear-gradient(135deg, var(--azul-primario), #6DD5FA); color: white; padding: 30px; border-radius: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); margin-bottom: 20px; transition: 0.3s; }
 .table-wrapper { background: var(--bg-card); border-radius: 12px; padding: 15px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); overflow-x: auto; border: 1px solid var(--borda); width: 100%;}
 table { width: 100%; border-collapse: collapse; min-width: 800px; }
-th, td { 
-    text-align: left; 
-    padding: 14px 12px; /* Demos um pouco mais de espaço para respirar */
-    border-bottom: 1px solid var(--borda); 
-    vertical-align: middle; /* 💡 MÁGICA 1: Força tudo a ficar centrado verticalmente */
-}th { background-color: var(--azul-claro); color: var(--azul-primario); }
-/* 💡 CORREÇÃO: Usamos inline-flex para alinhar o ícone e o texto geometricamente ao centro */
-.status { 
-    padding: 4px 10px; 
-    border-radius: 12px; 
-    font-size: 12px; 
-    font-weight: bold; 
-    color: white; 
-    display: inline-flex; 
-    align-items: center; 
-    gap: 5px; 
-}
+th, td { text-align: left; padding: 14px 12px; border-bottom: 1px solid var(--borda); vertical-align: middle; }
+th { background-color: var(--azul-claro); color: var(--azul-primario); }
+
+.status { padding: 4px 10px; border-radius: 12px; font-size: 12px; font-weight: bold; color: white; display: inline-flex; align-items: center; gap: 5px; }
 .status.ok { background-color: var(--ok); }
 .status.alerta { background-color: var(--atencao); color: #333; }
 .status.vencido { background-color: var(--perigo); }
@@ -203,7 +235,7 @@ th, td {
 @keyframes flutuar { 0% { transform: translateY(0px); } 50% { transform: translateY(-5px); } 100% { transform: translateY(0px); } }
 .aurora-status { margin-top: -15px; font-size: 12px; font-weight: bold; color: white; background: var(--ok); padding: 4px 12px; border-radius: 12px; box-shadow: 0 2px 5px rgba(0,0,0,0.2); z-index: 2; }
 
-/* 💡 MÁGICA: Esconde o botão do menu no computador, mas mantém no telemóvel */
+/* Esconde o botão do menu antigo no computador, mas mantém no telemóvel */
 @media (min-width: 769px) {
     .menu-toggle {
         display: none !important;
