@@ -216,10 +216,10 @@ th, td {
 
 /* Esconde o botão no computador */
 .btn-menu-mobile {
-    display: none;
+display: none;
     position: fixed;
     bottom: 20px;
-    right: 20px;
+    left: 20px;
     background-color: #3085d6;
     color: white;
     border: none;
