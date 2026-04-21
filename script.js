@@ -329,19 +329,39 @@ async function enviarParaIA() {
         tratarErroAuth(resposta); const dados = await resposta.json();
         
         if(resposta.ok) {
+            // Imprime a resposta da Aurora no chat
             chat.innerHTML += `<div style="background: var(--azul-claro); padding: 12px 15px; border-radius: 12px; align-self: flex-start; max-width: 85%; color: var(--texto); border-bottom-left-radius: 2px;"><b>Aurora ✨:</b> ${dados.message}</div>`; 
-            if (dados.configuracoes || dados.produtosAdicionados) {
-                // A Aurora ajudou com produtos/categorias! Recarregamos do servidor para garantir atualização global.
-                await carregarDadosGlobais();
-                await carregarEstoque();
+            
+            // 💡 A MÁGICA: Ouve o gatilho "refresh: true" vindo do backend
+            if (dados.refresh || dados.configuracoes || dados.produtosAdicionados) {
+                console.log("Aurora solicitou atualização da tabela...");
+                
+                // Força a atualização dos dados e da tabela por trás dos panos
+                if (typeof carregarDadosGlobais === 'function') await carregarDadosGlobais();
+                if (typeof carregarEstoque === 'function') await carregarEstoque();
+                if (typeof atualizarTabela === 'function') atualizarTabela();
+                
+                // Opcional: Feedback visual de luxo (SweetAlert2)
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Mágica Concluída!',
+                    text: 'A Aurora injetou os dados no seu estoque.',
+                    timer: 2500,
+                    showConfirmButton: false,
+                    background: document.body.classList.contains('dark-mode') ? '#1E293B' : '#fff',
+                    color: document.body.classList.contains('dark-mode') ? '#F9FAFB' : '#333'
+                });
             }
-        } else { chat.innerHTML += `<div style="background: #ffcccc; padding: 12px 15px; border-radius: 12px; align-self: flex-start; max-width: 85%; color: #333; border-bottom-left-radius: 2px;"><b>Aurora (Erro) ⚠️:</b> ${dados.error || 'Erro desconhecido'}</div>`; }
+        } else { 
+            chat.innerHTML += `<div style="background: #ffcccc; padding: 12px 15px; border-radius: 12px; align-self: flex-start; max-width: 85%; color: #333; border-bottom-left-radius: 2px;"><b>Aurora (Erro) ⚠️:</b> ${dados.error || 'Erro desconhecido'}</div>`; 
+        }
         salvarChatIA();
     } catch (erro) { 
         if (erro.message !== "Não autorizado") { chat.innerHTML += `<div style="background: #ffcccc; padding: 12px 15px; border-radius: 12px; align-self: flex-start; max-width: 85%; color: #333; border-bottom-left-radius: 2px;"><b>Sistema ❌:</b> Erro de comunicação.</div>`; salvarChatIA(); } 
-    } finally { btn.innerText = "Enviar"; btn.disabled = false; chat.scrollTop = chat.scrollHeight; }
+    } finally { 
+        btn.innerText = "Enviar"; btn.disabled = false; chat.scrollTop = chat.scrollHeight; 
+    }
 }
-
 function alternarTodosChecks(source) { const checkboxes = document.querySelectorAll('.check-item'); checkboxes.forEach(cb => cb.checked = source.checked); verificarBotoesMassa(); }
 function verificarBotoesMassa() {
     const checkboxes = document.querySelectorAll('.check-item:checked'); const btnApagar = document.getElementById('btnApagarMassa'); const btnImprimir = document.getElementById('btnImprimirMassa');
