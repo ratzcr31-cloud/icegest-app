@@ -3,108 +3,356 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>IceGest - Gestão de Estoque</title>
+    <title>IceGest - Sistema Premium</title>
+    
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" />
     <link rel="stylesheet" href="style.css">
 </head>
-<body class="modo-escuro">
+<body>
 
-    <button id="btnMenuMobile" class="btn-menu-mobile">☰</button>
-
-    <div class="container-geral">
-        
-        <aside class="sidebar" id="sidebar">
-            <div class="logo">
-                <h2>IceGest 🧊</h2>
+    <div id="tela-login">
+        <div class="login-box animar-entrada" id="box-auth">
+            <div id="form-login">
+                <h1>IceGest <span id="icon-icegest-login">🍦</span></h1>
+                <p class="subtitle">Bem-vindo de volta</p>
+                <input type="text" id="loginUser" placeholder="Seu Usuário" onkeydown="if(event.key === 'Enter') fazerLogin()">
+                <input type="password" id="loginPass" placeholder="Sua Senha" onkeydown="if(event.key === 'Enter') fazerLogin()">
+                <button onclick="fazerLogin()">Entrar no Sistema</button>
+                <p id="erroLogin" style="color: var(--perigo); margin-top: 10px; font-size: 13px; display: none;"></p>
+                <p class="link-auth" onclick="alternarTelaAuth()">Não tem conta? Cadastre-se aqui</p>
             </div>
-            <nav>
-                <ul>
-                    <li onclick="mostrarAba('dashboard')">📊 Dashboard</li>
-                    <li onclick="mostrarAba('estoque')">📦 Estoque</li>
-                    <li onclick="mostrarAba('aurora')">✨ Aurora IA</li>
-                    <li onclick="mostrarAba('configuracoes')">⚙️ Configurações</li>
-                    <li onclick="logout()" class="item-logout">🚪 Sair</li>
-                </ul>
-            </nav>
-        </aside>
+            <div id="form-cadastro" style="display: none;">
+                <h1>IceGest <span id="icon-icegest-cad">🍦</span></h1>
+                <p class="subtitle">Criar Nova Conta</p>
+                <input type="text" id="cadUser" placeholder="Escolha um Usuário" onkeydown="if(event.key === 'Enter') fazerCadastro()">
+                <input type="password" id="cadPass" placeholder="Crie uma Senha" onkeydown="if(event.key === 'Enter') fazerCadastro()">
+                <button onclick="fazerCadastro()" class="btn-sucesso">Cadastrar</button>
+                <p id="erroCadastro" style="color: var(--perigo); margin-top: 10px; font-size: 13px; display: none;"></p>
+                <p id="sucessoCadastro" style="color: var(--ok); margin-top: 10px; font-size: 13px; display: none;"></p>
+                <p class="link-auth" onclick="alternarTelaAuth()">Já tenho conta (Voltar ao Login)</p>
+            </div>
+        </div>
+    </div>
 
-        <main class="conteudo-principal">
+    <div id="app-completo">
+        <div class="menu-overlay" id="menuOverlay" onclick="toggleMenu()"></div>
+        
+        <div class="sidebar" id="sidebar">
+            <div class="logo-container">
+                <div class="logo"><span class="logo-text">IceGest</span> <span id="icon-icegest">🍦</span></div>
+                <button class="toggle-desktop" onclick="alternarSidebar()" title="Recolher Menu">❮</button>
+            </div>
             
-            <header class="cabecalho-sistema">
+            <div class="menu-item active" onclick="mudarAbaMenu(this, 'dashboard')" id="menu-dashboard">
+                <span class="menu-icon" id="icon-dashboard">📊</span> <span class="menu-text">Dashboard</span>
+            </div>
+            <div class="menu-item" onclick="mudarAbaMenu(this, 'estoque')" id="menu-estoque">
+                <span class="menu-icon" id="icon-estoque">📦</span> <span class="menu-text">Estoque</span>
+            </div>
+            <div class="menu-item" onclick="mudarAbaMenu(this, 'ia')" id="menu-ia">
+                <span class="menu-icon" id="icon-ia">🤖</span> <span class="menu-text">Consultora Aurora</span>
+            </div>
+            <div class="menu-item" style="margin-top: auto;" onclick="mudarAbaMenu(this, 'configuracoes')" id="menu-configuracoes">
+                <span class="menu-icon" id="icon-config">⚙️</span> <span class="menu-text">Configurações</span>
+            </div>
+            <div class="menu-item" onclick="fazerLogout()" style="color: var(--perigo);">
+                <span class="menu-icon" id="icon-logout">🚪</span> <span class="menu-text">Sair (Logout)</span>
+            </div>
+        </div>
+
+        <div class="main-container">
+            <div class="topbar">
+                <div class="abas">
+                    <button class="menu-toggle" onclick="toggleMenu()">☰</button>
+                    <div id="abas-filtro" style="display: flex; gap: 10px; overflow-x: auto; padding-bottom: 5px;"></div>
+                </div>
+                <div class="acoes-topbar">
+                    <div class="acoes-esquerda">
+                        <input type="text" id="inputPesquisa" class="barra-pesquisa" placeholder="Pesquisar item..." onkeyup="atualizarTabela()" style="font-family: 'Segoe UI', 'Font Awesome 6 Free'; font-weight: 900;">
+                        <select id="comboFiltroCategoria" class="btn-acao-top" onchange="filtrarTabelaCategoria(this.value)"></select>
+                        <select id="comboFiltroStatus" class="btn-acao-top" onchange="filtrarTabelaStatus(this.value)">
+                            <option value="Todos">Filtro de Status: Todos</option>
+                            <option value="Valido">Válidos</option>
+                            <option value="Atencao">Atenção</option>
+                            <option value="Vencido">Vencidos</option>
+                        </select>
+                        <button id="btnApagarMassa" class="btn-perigo" onclick="apagarSelecionados()">🗑️ Apagar</button>
+                        <button id="btnImprimirMassa" class="btn-primario" style="display: none;" onclick="imprimirEtiquetas()">🖨️ Etiquetas</button>
+                    </div>
+                    
+                    <div class="acoes-direita">
+                        <div class="dropdown">
+                            <button class="btn-primario" id="btn-main-export"><span id="icon-exportar">📤</span> Exportar ▼</button>
+                            <div class="dropdown-content">
+                                <a href="#" id="btn-export-excel" onclick="exportarParaExcel(); return false;">📊 Exportar para Excel</a>
+                                <a href="#" id="btn-export-pdf" onclick="exportarParaPDF(); return false;">📄 Gerar Relatório PDF</a>
+                                <a href="#" id="btn-export-lista" onclick="gerarListaCompras(); return false;">🛒 Lista de Compras Inteligente</a>
+                            </div>
+                        </div>
+                        <div class="user-profile" id="nomeUsuarioTopo" style="font-weight: bold; color: var(--azul-primario);">👤 Admin</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="content animar-entrada" id="tela-dashboard">
+                <div class="boas-vindas">
+                    <h1>Olá, <span id="nomeBoasVindas">Administrador</span>! <span id="icon-ola">👋</span></h1>
+                    <p id="fraseMotivacional">"O sucesso é a soma de pequenos esforços..."</p>
+                </div>
                 
-                <div class="acoes-topo">
-                    <button id="btnExportar" class="btn-acao" onclick="abrirMenuExportar()">📤 Exportar ▼</button>
-                    <div class="usuario-logado">
-                        👤 <span id="nomeUsuarioDisplay">Ratz</span>
+                <div class="widgets-grid" style="grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); margin-bottom: 20px;" id="cards-resumo"></div>
+
+                <h2><span id="icon-visao">📈</span> Visão Geral do Negócio</h2>
+                <div class="widgets-grid" style="margin-top: 10px;">
+                    <div class="card">
+                        <h3 class="card-title">Distribuição por Categoria</h3>
+                        <div style="position: relative; height: 250px; width: 100%; display: flex; justify-content: center;">
+                            <canvas id="graficoCategorias"></canvas>
+                        </div>
+                    </div>
+                    <div class="card">
+                        <h3 class="card-title">Situação por Setor</h3>
+                        <div style="position: relative; height: 250px; width: 100%;">
+                            <canvas id="graficoBarras"></canvas>
+                        </div>
                     </div>
                 </div>
 
-                <div class="abas-navegacao">
-                    <button class="aba-item ativa" onclick="filtrarPorSetor('Geral')">Geral</button>
-                    <button class="aba-item" onclick="filtrarPorSetor('Loja')">Loja</button>
-                    <button class="aba-item" onclick="filtrarPorSetor('Câmara Fria')">Câmara Fria</button>
-                    <button class="aba-item" onclick="filtrarPorSetor('Estoque Seco')">Estoque</button>
-                </div>
-            </header>
+                <h2 style="margin-top: 30px; margin-bottom: 10px; padding-top: 20px; border-top: 1px solid var(--borda);"><span id="icon-monitoramento">⏱️</span> Monitoramento de Validade</h2>
+                <p style="color: gray; margin-bottom: 20px; font-size: 14px;">Acompanhe aqui os itens que requerem a sua atenção imediata.</p>
+                <div class="grid-vencimentos" id="painel-vencimentos"></div>
+            </div>
 
-            <section class="area-pesquisa-filtros">
-                <div class="caixa-pesquisa">
-                    <input type="text" id="pesquisaItem" oninput="filtrarTabela()" placeholder="🔍 Pesquisar item...">
-                </div>
-                
-                <div class="caixa-filtros">
-                    <select id="filtroCategoria" onchange="filtrarTabela()">
-                        <option value="Todas">Filtro: Todas</option>
-                    </select>
-                    <select id="filtroStatus" onchange="filtrarTabela()">
-                        <option value="Todos">Filtro de Status: Todos</option>
-                        <option value="Normal">Normal</option>
-                        <option value="Atencao">Em Atenção</option>
-                        <option value="Vencido">Vencidos</option>
-                    </select>
-                </div>
-            </section>
-
-            <section class="sessao-tabela" id="abaEstoque">
-                <div class="tabela-responsiva">
-                    <table id="tabelaEstoque">
-                        <thead>
+            <div class="content animar-entrada" id="tela-estoque">
+                <div class="table-wrapper">
+                    <table id="tabela-estoque">
+                       <thead>
                             <tr>
-                                <th><input type="checkbox" id="checkTodos" onclick="selecionarTodos()"></th>
+                                <th style="width: 40px; text-align: center;"><input type="checkbox" id="checkTodos" onchange="alternarTodosChecks(this)"></th>
                                 <th>Item</th>
                                 <th>Categoria</th>
-                                <th>Estoque</th>
-                                <th>Setor</th>
-                                <th>Ações</th>
+                                <th style="text-align: center;">Estoque</th>
+                                <th style="text-align: center;">Setor</th>
+                                <th style="text-align: center;">Validade</th>
+                                <th style="text-align: center;">Tempo Restante</th>
+                                <th style="text-align: center;">Status</th>
+                                <th style="width: 50px; text-align: center;">Info</th>
+                                <th style="min-width: 120px; text-align: center;">Ações</th>
                             </tr>
                         </thead>
-                        <tbody id="corpoTabela">
-                            </tbody>
+                        <tbody id="corpo-tabela"></tbody>
                     </table>
                 </div>
-                
-                <button class="btn-flutuante-add" onclick="abrirModal()">+</button>
-            </section>
+            </div>
 
-            <section id="abaAurora" class="aba-conteudo" style="display:none;">
-                <div class="chat-container">
-                    <div class="chat-header">
-                        <h3>Assistente Aurora ✨</h3>
-                        <button onclick="limparChatIA()" class="btn-limpar-chat">🗑️ Limpar</button>
+            <div class="content animar-entrada" id="tela-ia">
+                <h2><span id="icon-titulo-ia">✨</span> Consultora Aurora (Inteligência Artificial)</h2>
+                <div class="card" style="display: flex; flex-direction: column; gap: 15px;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
+                        <p style="color: var(--texto); margin: 0;">Posso ler imagens e ajudar a organizar, alterar ou adicionar itens no seu estoque!</p>
+                        <button class="btn-acao-top" onclick="limparChatIA()" style="font-size: 12px; padding: 5px 10px;">🧹 Limpar Chat</button>
                     </div>
-                    <div id="chatHistorico" class="chat-mensagens">
+                    
+                    <div class="tela-ia-container" style="display: flex; gap: 15px; height: 350px;">
+                        <div class="aurora-container">
+                            <img src="assets/aurora.gif" alt="Aurora" class="aurora-avatar" onerror="this.src='https://raw.githubusercontent.com/Tarikul-Islam-Anik/Animated-Fluent-Emojis/master/Emojis/People%20with%20professions/Woman%20Technologist%20Light%20Skin%20Tone.png'; this.style.borderRadius='0';">
+                            <div class="aurora-status">Online</div>
                         </div>
-                    <div class="chat-input-area">
-                        <input type="text" id="inputChat" placeholder="Pergunte algo à Aurora..." autocomplete="off" data-lpignore="true">
-                        <button onclick="enviarMensagemIA()">🚀</button>
+
+                        <div id="chatHistorico" style="flex: 1; overflow-y: auto; background: var(--fundo); padding: 15px; border-radius: 8px; border: 1px solid var(--borda); display: flex; flex-direction: column; gap: 10px;"></div>
+                    </div>
+                    
+                    <div style="display: flex; gap: 10px; flex-wrap: wrap; align-items: center;">
+                        <div style="position: relative; overflow: hidden; display: inline-block;">
+                            <button class="btn-acao-top" style="cursor: pointer; padding: 12px;"><span id="icon-anexo">📎</span> Imagens</button>
+                            <input type="file" id="imagemIA" accept="image/*" multiple style="font-size: 100px; position: absolute; left: 0; top: 0; opacity: 0; cursor: pointer;" onchange="document.getElementById('nomeArquivoIA').innerText = this.files.length > 1 ? this.files.length + ' arquivos' : (this.files[0] ? this.files[0].name : '')">
+                        </div>
+                        <span id="nomeArquivoIA" style="font-size: 13px; color: var(--azul-primario); max-width: 100px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;"></span>
+                        <input type="text" id="perguntaIAReal" class="config-input" style="flex: 1; min-width: 200px; padding: 12px;" placeholder="Diga o que alterar ou envie imagens..." onkeydown="if(event.key === 'Enter') enviarParaIA()">
+                        <button class="btn-primario" id="btnEnviarIA" style="padding: 12px 20px;" onclick="enviarParaIA()">Enviar</button>
                     </div>
                 </div>
-            </section>
+            </div>
 
-        </main>
+            <div class="content animar-entrada" id="tela-configuracoes">
+                <h2 style="margin-bottom: 10px;">Configurações do Sistema</h2>
+                <div class="config-grid">
+                    
+                    <div class="card">
+                        <h3 class="card-title"><span id="icon-aparencia">🎨</span> Aparência Visual</h3>
+                        
+                        <div class="config-group">
+                            <label class="toggle-switch"><input type="checkbox" id="checkDarkMode" onchange="salvarPreferencias()"> Modo Escuro (Dashboard)</label>
+                            <label class="toggle-switch"><input type="checkbox" id="checkFonteGrande" onchange="salvarPreferencias()"> Modo Acessibilidade (Fonte Maior)</label>
+                        </div>
+                        
+                        <div class="config-group" style="margin-top: 25px;">
+                            <label class="block-label">Estilo de Ícones do Sistema</label>
+                            <select id="comboTipoIcone" class="config-input" onchange="salvarPreferencias()">
+                                <option value="emoji">Clássico (Emojis Nativo)</option>
+                                <option value="fontawesome">Profissional (FontAwesome)</option>
+                                <option value="material">Moderno (Google Material)</option>
+                            </select>
+                        </div>
+
+                        <div class="config-group" style="margin-top: 25px;">
+                            <label class="block-label">Imagem de Fundo do Sistema</label>
+                            <div class="input-with-button" style="margin-bottom: 10px;">
+                                <input type="url" id="inputBgUrl" class="config-input" placeholder="Ex: https://imagem.com/fundo.jpg">
+                                <button class="btn-primario" onclick="salvarPreferencias()">Aplicar Link</button>
+                            </div>
+                            
+                            <div style="position: relative; overflow: hidden; display: inline-block; width: 100%; margin-bottom: 10px;">
+                                <button class="btn-acao-top" style="width: 100%; padding: 10px; cursor: pointer; border: 2px dashed var(--borda); background: transparent;"><span id="icon-upload-bg">📂</span> Carregar do Computador</button>
+                                <input type="file" id="inputBgFile" accept="image/*" style="position: absolute; left: 0; top: 0; opacity: 0; cursor: pointer; width: 100%; height: 100%;" onchange="carregarImagemLocal(this)">
+                            </div>
+                            
+                            <button class="btn-perigo" style="width: 100%; padding: 8px;" onclick="removerFundo()"><span id="icon-remove-bg">🗑️</span> Remover Fundo</button>
+                        </div>
+                    </div>
+                    
+                    <div class="card">
+                        <h3 class="card-title"><span id="icon-pref">⚙️</span> Preferências Gerais</h3>
+                        <div class="config-group">
+                            <label class="block-label">Aviso padrão de vencimento (Dias)</label>
+                            <input type="number" id="inputDiasAlerta" class="config-input" min="1" onchange="salvarPreferencias()">
+                        </div>
+
+                        <hr style="border: 0; border-top: 1px solid var(--borda); margin: 25px 0;">
+
+                        <h3 class="card-title" style="margin-bottom: 10px; border-bottom: none;"><span id="icon-aurora-cfg">🤖</span> Integrações (Aurora)</h3>
+                        <p style="font-size: 13px; color: var(--texto); margin-bottom: 15px;">Cole aqui sua Chave API do Gemini para habilitar a automação.</p>
+                        <div class="config-group">
+                            <div class="input-with-button">
+                                <input type="password" id="inputApiKey" class="config-input" placeholder="AIzaSy..." autocomplete="new-password" data-lpignore="true">
+                                <button class="btn-acao-top" onclick="salvarChaveAPI()">Salvar</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <h3 class="card-title"><span id="icon-cat">🏷️</span> Gerenciar Categorias</h3>
+                        <div class="config-group">
+                            <label class="block-label">Nova Categoria e Dias de Aviso</label>
+                            <div class="input-with-button">
+                                <input type="text" id="novaCategoria" class="config-input" placeholder="Ex: Congelados">
+                                <input type="number" id="tempoValidadeCat" class="config-input" placeholder="Dias" style="width: 100px;">
+                                <button class="btn-primario" onclick="adicionarCategoria()">Add</button>
+                            </div>
+                            <ul class="lista-gestao" id="listaUiCategorias"></ul>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <h3 class="card-title"><span id="icon-setor">📍</span> Setores</h3>
+                        <div class="config-group">
+                            <label class="block-label">Novo Setor de Armazenamento</label>
+                            <div class="input-with-button">
+                                <input type="text" id="novoSetor" class="config-input" placeholder="Ex: Armazém A">
+                                <button class="btn-primario" onclick="adicionarSetor()">Add</button>
+                            </div>
+                            <ul class="lista-gestao" id="listaUiSetores"></ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <button class="fab" id="btnFab" onclick="abrirModal()" title="Adicionar Novo Item"><i class="fa-solid fa-plus"></i></button>
+        </div>
+    </div>
+
+    <div id="modalCadastro" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="tituloModal">Novo Produto</h2>
+                <span class="close-btn" onclick="fecharModal()">&times;</span>
+            </div>
+            <form id="formAdicionar" onsubmit="salvarItem(event)">
+                <input type="hidden" id="idItem"> 
+                <div class="form-group">
+                    <label>Nome</label>
+                    <input type="text" id="nomeItem" class="config-input" required>
+                </div>
+                <div class="form-group" style="display: flex; gap: 10px;">
+                    <div style="flex: 1;"><label>Categoria</label><select id="categoriaItem" class="config-input"></select></div>
+                    <div style="flex: 1;"><label>Setor</label><select id="setorItem" class="config-input" required></select></div>
+                </div>
+                <div class="form-group" style="display: flex; gap: 10px;">
+                    <div style="flex: 1;"><label>Estoque</label><input type="number" id="estoqueItem" class="config-input" required min="0"></div>
+                    <div style="flex: 1;"><label>Unidade</label>
+                        <select id="unidadeItem" class="config-input" required>
+                            <option value="Kg">Kg</option>
+                            <option value="Litros">Litros</option>
+                            <option value="Un">Unidade</option>
+                            <option value="Cx">Caixa</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Data de Validade</label>
+                    <input type="date" id="validadeItem" class="config-input" required>
+                </div>
+                <div class="form-group">
+                    <label>Observações Extras</label>
+                    <textarea id="obsItem" class="config-input" rows="3" placeholder="Anotações extras..." style="resize: none;"></textarea>
+                </div>
+                <div class="form-group">
+                    <label>URL da Imagem de Referência (Opcional)</label>
+                    <input type="url" id="imagemItem" class="config-input" placeholder="Ex: https://imagem.com/foto.jpg">
+                </div>
+                <button type="submit" class="btn-primario" style="width: 100%;">Salvar Produto(s)</button>
+            </form>
+        </div>
+    </div>
+
+    <div id="modalObservacao" class="modal">
+        <div class="modal-content" style="max-width: 400px;">
+            <div class="modal-header">
+                <h2>Detalhes do Produto</h2>
+                <span class="close-btn" onclick="fecharModalObservacao()">&times;</span>
+            </div>
+            <input type="hidden" id="idProdutoObs"> 
+            
+            <div id="containerImagemRef" style="display: none; text-align: center; margin-bottom: 15px;">
+                <img id="imgRefObs" src="" alt="Referência" style="max-width: 100%; max-height: 200px; border-radius: 8px; border: 1px solid var(--borda);">
+            </div>
+
+            <div class="form-group">
+                <textarea id="textoObservacao" class="config-input" rows="5" placeholder="Sem observações..." style="resize: none; font-family: inherit; font-size: 14px;"></textarea>
+            </div>
+            <button type="button" class="btn-primario" style="width: 100%; margin-top: 10px;" onclick="salvarObservacaoRapida()">Salvar Anotação</button>
+        </div>
+    </div>
+
+    <div id="modalEdicaoConfig" class="modal">
+        <div class="modal-content" style="max-width: 400px;">
+            <div class="modal-header">
+                <h2 id="tituloModalEdicao">Editar</h2>
+                <span class="close-btn" onclick="fecharModalEdicao()">&times;</span>
+            </div>
+            <form id="formEdicaoConfig" onsubmit="salvarEdicaoConfig(event)">
+                <div class="form-group">
+                    <label id="labelNomeEdicao">Nome</label>
+                    <input type="text" id="inputNomeEdicao" class="config-input" required>
+                </div>
+                <div class="form-group" id="grupoDiasEdicao">
+                    <label>Aviso de Validade (Dias)</label>
+                    <input type="number" id="inputDiasEdicao" class="config-input" min="1">
+                </div>
+                <button type="submit" class="btn-primario" style="width: 100%; margin-top: 10px;">Salvar Alterações</button>
+            </form>
+        </div>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    
     <script src="script.js"></script>
-
+</body>
+</html>
 </body>
 </html>
