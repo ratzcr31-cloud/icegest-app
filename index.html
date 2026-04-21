@@ -5,13 +5,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>IceGest - Gestão de Estoque</title>
     <link rel="stylesheet" href="style.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
-<body class="modo-escuro"> <button id="btnMenuMobile" class="btn-menu-mobile">☰</button>
+<body class="modo-escuro">
+
+    <button id="btnMenuMobile" class="btn-menu-mobile">☰</button>
 
     <div class="container-geral">
         
-        <aside class="sidebar">
+        <aside class="sidebar" id="sidebar">
             <div class="logo">
                 <h2>IceGest 🧊</h2>
             </div>
@@ -29,6 +30,7 @@
         <main class="conteudo-principal">
             
             <header class="cabecalho-sistema">
+                
                 <div class="acoes-topo">
                     <button id="btnExportar" class="btn-acao" onclick="abrirMenuExportar()">📤 Exportar ▼</button>
                     <div class="usuario-logado">
@@ -52,7 +54,7 @@
                 <div class="caixa-filtros">
                     <select id="filtroCategoria" onchange="filtrarTabela()">
                         <option value="Todas">Filtro: Todas</option>
-                        </select>
+                    </select>
                     <select id="filtroStatus" onchange="filtrarTabela()">
                         <option value="Todos">Filtro de Status: Todos</option>
                         <option value="Normal">Normal</option>
@@ -62,7 +64,7 @@
                 </div>
             </section>
 
-            <section class="sessao-tabela">
+            <section class="sessao-tabela" id="abaEstoque">
                 <div class="tabela-responsiva">
                     <table id="tabelaEstoque">
                         <thead>
@@ -92,59 +94,13 @@
                     <div id="chatHistorico" class="chat-mensagens">
                         </div>
                     <div class="chat-input-area">
-                        <input type="text" id="inputChat" placeholder="Pergunte algo à Aurora...">
+                        <input type="text" id="inputChat" placeholder="Pergunte algo à Aurora..." autocomplete="off" data-lpignore="true">
                         <button onclick="enviarMensagemIA()">🚀</button>
                     </div>
                 </div>
             </section>
 
-            <section id="abaConfiguracoes" class="aba-conteudo" style="display:none;">
-                <div class="card-config">
-                    <h3>Chave da Aurora (Gemini API)</h3>
-                    <input type="text" id="inputApiKey" placeholder="Cole sua chave AIza..." autocomplete="off">
-                    <button onclick="salvarConfiguracoes()" class="btn-salvar">Salvar Chave</button>
-                </div>
-
-                <div class="card-config">
-                    <h3>Gerenciar Categorias</h3>
-                    <div id="listaCategoriasConfig"></div>
-                    <button onclick="addCategoria()" class="btn-add-config">+ Nova Categoria</button>
-                </div>
-
-                <div class="card-config">
-                    <h3>Gerenciar Setores</h3>
-                    <div id="listaSetoresConfig"></div>
-                    <button onclick="addSetor()" class="btn-add-config">+ Novo Setor</button>
-                </div>
-            </section>
-
         </main>
-    </div>
-
-    <div id="modalItem" class="modal">
-        <div class="modal-content">
-            <span class="close" onclick="fecharModal()">&times;</span>
-            <h2 id="tituloModal">Cadastrar Produto</h2>
-            <form id="formItem" onsubmit="salvarItem(event)">
-                <input type="hidden" id="idItem">
-                <input type="text" id="nomeItem" placeholder="Nome do Item" required>
-                
-                <div class="row">
-                    <select id="categoriaItem" required></select>
-                    <select id="setorItem" required></select>
-                </div>
-
-                <div class="row">
-                    <input type="number" id="estoqueItem" placeholder="Qtd. Atual" required>
-                    <input type="text" id="unidadeItem" placeholder="Unidade (ex: Kg, Un)" required>
-                </div>
-
-                <input type="date" id="validadeItem" required>
-                <textarea id="obsItem" placeholder="Observações (opcional)"></textarea>
-                
-                <button type="submit" class="btn-submit">Salvar no Sistema</button>
-            </form>
-        </div>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
