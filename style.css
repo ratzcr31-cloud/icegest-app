@@ -211,15 +211,13 @@ th, td {
 }
 
 /* ==========================================
-   MENU MOBILE & RESPONSIVIDADE
+   MENU MOBILE FLUTUANTE (Inferior Esquerdo)
 ========================================== */
-
-/* Esconde o botão no computador */
 .btn-menu-mobile {
-display: none;
+    display: none;
     position: fixed;
     bottom: 20px;
-    left: 20px;
+    left: 20px; /* 💡 Movido para a esquerda, libertando o botão Adicionar (+) */
     background-color: #3085d6;
     color: white;
     border: none;
@@ -233,26 +231,58 @@ display: none;
     transition: background 0.3s;
 }
 
-/* Quando estiver num ecrã pequeno (Telemóvel) */
+/* ==========================================
+   REGRAS ESPECÍFICAS PARA TELEMÓVEL
+========================================== */
 @media (max-width: 768px) {
-    /* Mostra o botão flutuante */
+    /* Mostra o botão hambúrguer flutuante */
     .btn-menu-mobile {
         display: block;
     }
 
-    /* Esconde a barra lateral puxando-a para a esquerda */
-    .sidebar {
-        position: fixed;
-        left: -100%; /* Escondida fora do ecrã */
-        top: 0;
-        height: 100vh;
-        z-index: 9998;
-        transition: left 0.3s ease;
-        box-shadow: 2px 0 10px rgba(0,0,0,0.5);
+    /* O Cabeçalho precisa ser "relative" para segurar as ações no topo */
+    .cabecalho-sistema {
+        position: relative;
+        padding-top: 50px; /* Cria um espaço vazio no topo para caber o Exportar/Usuário */
+        margin-bottom: 15px;
     }
 
-    /* Classe mágica para quando clicarmos no botão */
-    .sidebar.aberta {
-        left: 0; /* Volta para o ecrã */
+    /* 💡 Move o Exportar e o Usuário para o canto superior direito absoluto */
+    .acoes-topo {
+        position: absolute;
+        top: 0;
+        right: 10px;
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        z-index: 10;
+    }
+
+    /* Reduz um pouco o tamanho dos botões do topo para caberem bem no telemóvel */
+    .acoes-topo .btn-acao {
+        padding: 5px 10px;
+        font-size: 12px;
+    }
+
+    .acoes-topo .usuario-logado {
+        font-size: 14px;
+        font-weight: bold;
+    }
+
+    /* Organiza a barra de pesquisa e filtros para ficarem um debaixo do outro no telemóvel */
+    .area-pesquisa-filtros {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+    }
+    
+    .caixa-filtros {
+        display: flex;
+        gap: 10px;
+        width: 100%;
+    }
+    
+    .caixa-filtros select {
+        flex: 1; /* Faz os filtros dividirem o espaço igualmente */
     }
 }
