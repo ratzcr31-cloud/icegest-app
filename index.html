@@ -177,7 +177,7 @@
                             <input type="file" id="imagemIA" accept="image/*" multiple style="font-size: 100px; position: absolute; left: 0; top: 0; opacity: 0; cursor: pointer;" onchange="document.getElementById('nomeArquivoIA').innerText = this.files.length > 1 ? this.files.length + ' arquivos' : (this.files[0] ? this.files[0].name : '')">
                         </div>
                         <span id="nomeArquivoIA" style="font-size: 13px; color: var(--azul-primario); max-width: 100px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;"></span>
-                        <input type="text" id="perguntaIAReal" class="config-input" style="flex: 1; min-width: 200px; padding: 12px;" placeholder="Diga o que alterar ou envie imagens..." onkeydown="if(event.key === 'Enter') enviarParaIA()">
+                        <input type="text" id="perguntaIAReal" class="config-input" style="flex: 1; min-width: 200px; padding: 12px;" placeholder="Diga o que alterar ou envie imagens..." autocomplete="off" data-lpignore="true" onkeydown="if(event.key === 'Enter') enviarParaIA()">
                         <button class="btn-primario" id="btnEnviarIA" style="padding: 12px 20px;" onclick="enviarParaIA()">Enviar</button>
                     </div>
                 </div>
