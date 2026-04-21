@@ -1,188 +1,226 @@
-/* ==========================================
-   RESET E VARIÁVEIS (Baseado na tua print)
-========================================== */
-* {
+/* VARIÁVEIS E TEMAS (CORES CORRIGIDAS PARA MELHOR LEITURA) */
+:root { --azul-primario: #2A81CB; --azul-claro: #E8F1F8; --pessego: #FFD3B6; --fundo: #F4F7F6; --texto: #1F2937; --borda: #D1D5DB; --perigo: #EF4444; --atencao: #F59E0B; --ok: #10B981; --bg-card: #ffffff; --tamanho-fonte: 14px;}
+
+body.dark-mode { --fundo: #0F172A; --texto: #F9FAFB; --borda: #374151; --bg-card: #1E293B; --azul-claro: #1E3A8A; }
+body.dark-mode th { color: #ffffff; background-color: #111827; } 
+body.dark-mode .aba { color: #9CA3AF; } 
+body.dark-mode .aba.active { color: #60A5FA; border-bottom-color: #60A5FA; }
+body.dark-mode .close-btn { color: #F9FAFB; }
+/* 💡 NOVO: Garante que os inputs no modo escuro têm fundo escuro e texto claro */
+body.dark-mode input, body.dark-mode select, body.dark-mode textarea { background-color: #0F172A; color: #F9FAFB; border-color: #4B5563; }
+body.large-font { --tamanho-fonte: 18px; } 
+
+* { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
+body { 
+    background-color: var(--fundo); 
+    background-image: var(--bg-img, none); 
+    background-size: cover;                
+    background-position: center;           
+    background-attachment: fixed;          
+    color: var(--texto); 
+    display: block; /* 💡 MUDÁMOS DE FLEX PARA BLOCK */
+    width: 100vw; 
+    height: 100vh; 
     margin: 0;
     padding: 0;
-    box-sizing: border-box;
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    overflow: hidden; 
+    transition: background-color 0.3s, color 0.3s, background-image 0.5s; 
+    font-size: var(--tamanho-fonte); 
 }
 
-body.modo-escuro {
-    background-color: #0f172a; /* Fundo azul muito escuro */
-    color: #e2e8f0;
+/* TELA DE LOGIN */
+#tela-login { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(135deg, var(--azul-primario), #6DD5FA); display: flex; justify-content: center; align-items: center; z-index: 10000; }
+.login-box { background: var(--bg-card); padding: 40px; border-radius: 12px; box-shadow: 0 10px 25px rgba(0,0,0,0.2); width: 90%; max-width: 350px; text-align: center; border: 1px solid var(--borda); }
+.login-box h1 { color: var(--azul-primario); margin-bottom: 5px; }
+.login-box p.subtitle { color: gray; margin-bottom: 20px; font-size: 14px; }
+.login-box input { width: 100%; padding: 12px; margin-bottom: 15px; border: 1px solid var(--borda); border-radius: 6px; outline: none; transition: 0.3s; background: var(--fundo); color: var(--texto);}
+.login-box input:focus { border-color: var(--azul-primario); }
+.login-box button { width: 100%; padding: 12px; background: var(--azul-primario); color: white; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; transition: 0.3s; }
+.login-box button:hover { background: #1f639e; }
+.login-box button.btn-sucesso { background: var(--ok); }
+.login-box button.btn-sucesso:hover { background: #3d8c40; }
+.link-auth { margin-top: 15px; font-size: 13px; color: var(--azul-primario); cursor: pointer; text-decoration: underline; font-weight: 500; transition: 0.2s;}
+.link-auth:hover { color: #1f639e; }
+
+#app-completo { 
+    display: none; /* O JS muda isto para 'flex' ao fazer login */
+    width: 100vw;  /* 💡 FORÇA 100% DA LARGURA DA TELA */
+    height: 100vh; /* 💡 FORÇA 100% DA ALTURA DA TELA */
+    position: relative; 
 }
 
-/* ==========================================
-   ESTRUTURA GERAL (PC)
-========================================== */
-.container-geral {
-    display: flex;
-    height: 100vh;
-    overflow: hidden;
-}
-
-/* BARRA LATERAL */
-.sidebar {
-    width: 250px;
-    background-color: #1e293b;
-    border-right: 1px solid #334155;
-    padding: 20px;
-    display: flex;
-    flex-direction: column;
-    transition: left 0.3s ease;
-}
-
-.sidebar .logo h2 {
-    color: #38bdf8;
-    margin-bottom: 30px;
-    text-align: center;
-}
-
-.sidebar nav ul { list-style: none; }
-.sidebar nav ul li {
-    padding: 15px;
-    margin-bottom: 10px;
-    background-color: transparent;
-    border-radius: 8px;
-    cursor: pointer;
-    transition: background 0.2s;
-}
-.sidebar nav ul li:hover { background-color: #334155; }
-.item-logout { color: #f87171; margin-top: auto; }
-
-/* CONTEÚDO PRINCIPAL */
-.conteudo-principal {
-    flex: 1;
-    padding: 20px;
-    overflow-y: auto;
-    position: relative; /* Importante para o telemóvel */
-}
-
-/* ==========================================
-   CABEÇALHO (Abas e Ações)
-========================================== */
-.cabecalho-sistema {
-    margin-bottom: 20px;
-    border-bottom: 1px solid #334155;
-    padding-bottom: 10px;
-}
-
-.acoes-topo {
-    display: flex;
-    justify-content: flex-end;
-    align-items: center;
-    gap: 15px;
-    margin-bottom: 15px;
-}
-
-.btn-acao {
-    background-color: #e2e8f0;
-    color: #0f172a;
-    border: none;
-    padding: 8px 15px;
-    border-radius: 5px;
-    cursor: pointer;
-    font-weight: bold;
-}
-
-.usuario-logado {
-    font-weight: bold;
-    color: #38bdf8;
-}
-
-.abas-navegacao {
-    display: flex;
-    gap: 10px;
-}
-
-.aba-item {
-    background: transparent;
-    border: none;
-    color: #94a3b8;
-    padding: 10px 15px;
-    cursor: pointer;
-    font-size: 16px;
-    border-bottom: 3px solid transparent;
-}
-
-.aba-item.ativa {
-    color: #38bdf8;
-    border-bottom: 3px solid #38bdf8;
-    font-weight: bold;
-}
-
-/* ==========================================
-   PESQUISA E FILTROS
-========================================== */
-.area-pesquisa-filtros {
-    display: flex;
-    justify-content: space-between;
-    margin-bottom: 20px;
-    gap: 15px;
-}
-
-.caixa-pesquisa input, .caixa-filtros select, #inputChat {
-    background-color: #1e293b;
-    border: 1px solid #334155;
-    color: #e2e8f0;
-    padding: 10px;
-    border-radius: 5px;
+.main-container { 
+    flex: 1; /* Garante que o lado direito ocupa todo o espaço que sobra */
+    display: flex; 
+    flex-direction: column; 
+    overflow-y: auto; 
+    position: relative; 
+    scroll-behavior: smooth; 
     width: 100%;
 }
 
-.caixa-pesquisa { flex: 1; }
-.caixa-filtros { display: flex; gap: 10px; flex: 1; }
+@keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+.animar-entrada { animation: fadeIn 0.4s ease-out forwards; }
+
+/* === MENU LATERAL & RESPONSIVIDADE === */
+.logo-container { display: flex; align-items: center; justify-content: space-between; border-bottom: 2px solid var(--borda); padding-bottom: 15px; margin-bottom: 10px; transition: 0.3s; width: 100%; }
+.logo { font-size: 24px; font-weight: bold; color: var(--azul-primario); white-space: nowrap; display: flex; align-items: center; gap: 8px; }
+
+.toggle-desktop { background: var(--azul-claro); border: none; color: var(--azul-primario); width: 30px; height: 30px; border-radius: 50%; cursor: pointer; font-weight: bold; display: flex; align-items: center; justify-content: center; transition: 0.3s; flex-shrink: 0; }
+.toggle-desktop:hover { filter: brightness(0.9); transform: scale(1.1); }
+
+.sidebar { display: flex; width: 260px; flex-shrink: 0; background-color: var(--bg-card); border-right: 1px solid var(--borda); padding: 20px; flex-direction: column; gap: 15px; transition: width 0.3s ease, padding 0.3s ease; overflow-x: hidden; }
+
+/* A barra lateral recolhida */
+.sidebar.recolhida { width: 85px; align-items: center; padding: 20px 10px; }
+.sidebar.recolhida .logo-text, .sidebar.recolhida .menu-text { display: none; }
+
+/* 💡 CORREÇÃO 1: Centraliza o botão e o gelado verticalmente */
+.sidebar.recolhida .logo-container { border-bottom: none; padding-bottom: 0; justify-content: center; align-items: center; flex-direction: column-reverse; gap: 20px; width: 100%; margin-bottom: 15px; }
+.sidebar.recolhida .toggle-desktop { transform: rotate(180deg); margin: 0 auto; }
+
+/* 💡 CORREÇÃO 2: Força os ícones a ficarem exatamente no centro do bloco azul (quando ativo) */
+.sidebar.recolhida .menu-item { justify-content: center; padding: 12px 0; width: 100%; }
+
+.menu-item { display: flex; align-items: center; gap: 12px; padding: 12px; border-radius: 8px; cursor: pointer; transition: 0.3s; font-weight: 600; white-space: nowrap; width: 100%; }
+
+/* 💡 CORREÇÃO 3: Dá um tamanho fixo aos ícones, assim os textos à direita ficam todos alinhados numa linha perfeita na barra expandida */
+.menu-icon { font-size: 18px; width: 25px; text-align: center; display: inline-block; }
+
+.menu-item:hover, .menu-item.active { background-color: var(--azul-claro); color: var(--azul-primario); }
+
+/* MODO MOBILE */
+@media (max-width: 768px) {
+    .menu-toggle { display: block; }
+    .sidebar { position: fixed; left: -260px; top: 0; height: 100%; z-index: 1000; box-shadow: 2px 0 10px rgba(0,0,0,0.3); }
+    .sidebar.aberta { left: 0; }
+    .menu-overlay.aberta { display: block; }
+    .acoes-esquerda, .acoes-direita { width: 100%; justify-content: flex-start; }
+    .acoes-direita { margin-left: 0; margin-top: 10px; }
+    .barra-pesquisa { width: 100%; }
+    .tela-ia-container { flex-direction: column !important; height: auto !important; }
+    .aurora-container { width: 100%; flex-direction: row; justify-content: center; margin-bottom: -20px; z-index: 2; }
+    .aurora-avatar { width: 80px; height: 80px; }
+    .aurora-status { margin-top: 0; margin-left: -15px; }
+    #chatHistorico { height: 400px !important; margin-top: 10px;}
+}
+
+.topbar { display: flex; flex-direction: column; align-items: flex-start; padding: 15px 20px; background-color: var(--bg-card); border-bottom: 1px solid var(--borda); gap: 15px; position: relative; z-index: 50; }
+.abas { display: flex; align-items: center; flex-wrap: wrap; width: 100%; border-bottom: 1px solid var(--borda); padding-bottom: 5px;}
+.aba { padding: 8px 12px; color: gray; cursor: pointer; white-space: nowrap; transition: 0.3s; border-bottom: 3px solid transparent; font-weight: 600; margin-right: 15px;}
+.aba.active { color: var(--azul-primario); border-bottom: 3px solid var(--azul-primario); }
+
+.acoes-topbar { display: flex; justify-content: space-between; align-items: center; gap: 10px; flex-wrap: wrap; width: 100%;}
+.acoes-esquerda { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+.acoes-direita { display: flex; gap: 15px; align-items: center; margin-left: auto; }
+
+.barra-pesquisa { padding: 8px 12px; border: 1px solid var(--borda); border-radius: 6px; outline: none; background: var(--fundo); color: var(--texto); width: 200px; transition: 0.3s; }
+.barra-pesquisa:focus { border-color: var(--azul-primario); box-shadow: 0 0 5px rgba(42, 129, 203, 0.3); }
+.btn-acao-top { background-color: var(--bg-card); border: 1px solid var(--borda); padding: 8px 12px; border-radius: 6px; cursor: pointer; font-weight: bold; color: var(--texto); outline: none; transition: 0.3s; }
+.btn-acao-top:hover { border-color: var(--azul-primario); color: var(--azul-primario); }
+.btn-primario { background-color: var(--azul-primario); color: white; border: none; padding: 10px 15px; border-radius: 6px; cursor: pointer; font-weight: bold; transition: 0.3s; }
+.btn-primario:hover { filter: brightness(0.9); }
+.btn-perigo { background-color: var(--perigo); color: white; border: none; padding: 10px 15px; border-radius: 6px; cursor: pointer; font-weight: bold; transition: 0.3s; display: none; }
+.btn-perigo:hover { filter: brightness(0.9); }
+
+.dropdown { position: relative; display: inline-block; }
+.dropdown-content { display: none; position: absolute; right: 0; top: 100%; margin-top: 5px; background-color: var(--bg-card); min-width: 160px; box-shadow: 0 8px 16px rgba(0,0,0,0.15); z-index: 100; border-radius: 8px; border: 1px solid var(--borda); overflow: hidden; }
+.dropdown-content a { color: var(--texto); padding: 12px 16px; text-decoration: none; display: block; transition: 0.2s; font-weight: 500; font-size: 14px; }
+.dropdown-content a:hover { background-color: var(--azul-claro); color: var(--azul-primario); }
+.dropdown:hover .dropdown-content { display: block; animation: fadeIn 0.2s; }
+
+.content { padding: 20px; display: none; flex-direction: column; gap: 20px; padding-bottom: 80px; }
+.content.active { display: flex; } 
+
+.card { background: var(--bg-card); border-radius: 12px; padding: 24px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); border: 1px solid var(--borda); transition: transform 0.2s; width: 100%; overflow: hidden;}
+.card-title { font-size: 16px; margin-bottom: 20px; color: var(--texto); font-weight: 600; display: flex; align-items: center; gap: 8px; border-bottom: 1px solid var(--borda); padding-bottom: 12px;}
+.widgets-grid { display: grid; grid-template-columns: 1fr; gap: 20px; }
+@media (min-width: 768px) { .widgets-grid { grid-template-columns: 1fr 1fr; } }
+
+.boas-vindas { background: linear-gradient(135deg, var(--azul-primario), #6DD5FA); color: white; padding: 30px; border-radius: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); margin-bottom: 20px; transition: 0.3s; }
+.table-wrapper { background: var(--bg-card); border-radius: 12px; padding: 15px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); overflow-x: auto; border: 1px solid var(--borda); width: 100%;}
+table { width: 100%; border-collapse: collapse; min-width: 800px; }
+th, td { 
+    text-align: left; 
+    padding: 14px 12px; /* Demos um pouco mais de espaço para respirar */
+    border-bottom: 1px solid var(--borda); 
+    vertical-align: middle; /* 💡 MÁGICA 1: Força tudo a ficar centrado verticalmente */
+}th { background-color: var(--azul-claro); color: var(--azul-primario); }
+/* 💡 CORREÇÃO: Usamos inline-flex para alinhar o ícone e o texto geometricamente ao centro */
+.status { 
+    padding: 4px 10px; 
+    border-radius: 12px; 
+    font-size: 12px; 
+    font-weight: bold; 
+    color: white; 
+    display: inline-flex; 
+    align-items: center; 
+    gap: 5px; 
+}
+.status.ok { background-color: var(--ok); }
+.status.alerta { background-color: var(--atencao); color: #333; }
+.status.vencido { background-color: var(--perigo); }
+.btn-icon { border: none; background: none; cursor: pointer; font-size: 16px; margin-right: 10px; transition: 0.2s; color: var(--texto); }
+.btn-icon:hover { transform: scale(1.2); }
+.grid-vencimentos { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 15px; }
+.item-vencimento { border-left: 5px solid var(--perigo); padding: 15px; background: var(--bg-card); border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); transition: 0.3s; border: 1px solid var(--borda);}
+
+@keyframes pulse-red { 0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(255, 107, 107, 0.7); } 70% { transform: scale(1.1); box-shadow: 0 0 0 6px rgba(255, 107, 107, 0); } 100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(255, 107, 107, 0); } }
+.pulso-vermelho { display: inline-block; width: 10px; height: 10px; background-color: var(--perigo); border-radius: 50%; margin-right: 8px; animation: pulse-red 1.5s infinite; }
+
+.config-grid { display: grid; grid-template-columns: 1fr; gap: 24px; }
+@media (min-width: 1024px) { .config-grid { grid-template-columns: 1fr 1fr; } }
+.config-group { margin-bottom: 20px; }
+.config-group label.block-label { display: block; margin-bottom: 8px; font-weight: 600; font-size: 13px; color: gray;}
+.toggle-switch { display: flex; align-items: center; gap: 10px; cursor: pointer; padding: 10px 0; border-bottom: 1px solid var(--borda); font-weight: 500;}
+.toggle-switch:last-child { border-bottom: none; }
+.config-input { padding: 12px; border: 1px solid var(--borda); border-radius: 8px; width: 100%; background: var(--fundo); color: var(--texto); outline: none; transition: 0.3s; font-size: 14px;}
+.config-input:focus { border-color: var(--azul-primario); box-shadow: 0 0 0 3px rgba(42, 129, 203, 0.1); }
+.config-input:disabled { background-color: var(--borda); cursor: not-allowed; }
+.input-with-button { display: flex; gap: 10px; }
+.input-with-button .config-input { margin-bottom: 0; }
+
+.lista-gestao { list-style: none; margin-top: 15px; }
+.lista-gestao li { display: flex; justify-content: space-between; align-items: center; padding: 12px; background: var(--fundo); border: 1px solid var(--borda); margin-bottom: 8px; border-radius: 8px; font-weight: 500;}
+
+.fab { position: fixed; bottom: 30px; right: 30px; background-color: var(--texto); color: var(--fundo); width: 60px; height: 60px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 30px; cursor: pointer; box-shadow: 0 4px 10px rgba(0,0,0,0.3); border: none; z-index: 10; transition: 0.3s; }
+.fab:hover { transform: scale(1.1) rotate(90deg); background-color: var(--azul-primario); color: white; }
+
+.modal { display: none; position: fixed; z-index: 10000; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.5); align-items: center; justify-content: center; opacity: 0; transition: opacity 0.3s; }
+.modal.show { display: flex; opacity: 1; }
+.modal-content { background-color: var(--bg-card); padding: 25px; border-radius: 12px; width: 95%; max-width: 450px; transform: scale(0.8); transition: transform 0.3s; border: 1px solid var(--borda); max-height: 90vh; overflow-y: auto;}
+.modal.show .modal-content { transform: scale(1); }
+.modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; color: var(--azul-primario); }
+.close-btn { font-size: 24px; cursor: pointer; transition: 0.2s; }
+.form-group { margin-bottom: 15px; }
+.form-group label { display: block; margin-bottom: 5px; color: var(--texto); font-weight: bold; font-size: 13px;}
+
+.icon-obs { cursor: pointer; display: inline-block; transition: 0.2s; }
+.icon-obs:hover { transform: scale(1.2); }
+
+.aurora-container { display: flex; flex-direction: column; align-items: center; justify-content: center; width: 160px; padding: 10px; }
+.aurora-avatar { width: 140px; height: 140px; border-radius: 50%; object-fit: cover; box-shadow: 0 5px 15px rgba(0,0,0,0.2); border: 4px solid var(--azul-claro); background-color: white; animation: flutuar 4s ease-in-out infinite; }
+@keyframes flutuar { 0% { transform: translateY(0px); } 50% { transform: translateY(-5px); } 100% { transform: translateY(0px); } }
+.aurora-status { margin-top: -15px; font-size: 12px; font-weight: bold; color: white; background: var(--ok); padding: 4px 12px; border-radius: 12px; box-shadow: 0 2px 5px rgba(0,0,0,0.2); z-index: 2; }
+
+/* 💡 MÁGICA: Esconde o botão do menu no computador, mas mantém no telemóvel */
+@media (min-width: 769px) {
+    .menu-toggle {
+        display: none !important;
+    }
+}
 
 /* ==========================================
-   TABELA DE ESTOQUE
+   MENU MOBILE & RESPONSIVIDADE
 ========================================== */
-.tabela-responsiva {
-    background-color: #1e293b;
-    border-radius: 10px;
-    padding: 10px;
-    overflow-x: auto;
-}
 
-table {
-    width: 100%;
-    border-collapse: collapse;
-}
-
-th, td {
-    padding: 12px;
-    text-align: left;
-    border-bottom: 1px solid #334155;
-}
-
-th { color: #38bdf8; }
-
-/* ==========================================
-   BOTÕES FLUTUANTES (Desktop e Mobile)
-========================================== */
-.btn-flutuante-add {
-    position: fixed;
-    bottom: 30px;
-    right: 30px;
-    background-color: #38bdf8;
-    color: white;
-    border: none;
-    border-radius: 50%;
-    width: 60px;
-    height: 60px;
-    font-size: 30px;
-    cursor: pointer;
-    box-shadow: 0 4px 10px rgba(0,0,0,0.3);
-    z-index: 100;
-}
-
-/* O Botão Mobile fica escondido no PC */
+/* Esconde o botão no computador */
 .btn-menu-mobile {
     display: none;
     position: fixed;
-    bottom: 30px;
-    left: 30px;
-    background-color: #38bdf8;
+    bottom: 20px;
+    right: 20px;
+    background-color: #3085d6;
     color: white;
     border: none;
     border-radius: 50%;
@@ -192,52 +230,29 @@ th { color: #38bdf8; }
     box-shadow: 0 4px 10px rgba(0,0,0,0.3);
     z-index: 9999;
     cursor: pointer;
+    transition: background 0.3s;
 }
 
-/* ==========================================
-   📱 MAGIA DO MOBILE (Ecrãs até 768px)
-========================================== */
+/* Quando estiver num ecrã pequeno (Telemóvel) */
 @media (max-width: 768px) {
-    /* 1. Mostra o botão hambúrguer à esquerda */
-    .btn-menu-mobile { display: block; }
+    /* Mostra o botão flutuante */
+    .btn-menu-mobile {
+        display: block;
+    }
 
-    /* 2. Esconde a Sidebar e prepara-a para deslizar */
+    /* Esconde a barra lateral puxando-a para a esquerda */
     .sidebar {
         position: fixed;
-        left: -100%; /* Fora do ecrã */
+        left: -100%; /* Escondida fora do ecrã */
         top: 0;
         height: 100vh;
         z-index: 9998;
+        transition: left 0.3s ease;
+        box-shadow: 2px 0 10px rgba(0,0,0,0.5);
     }
 
+    /* Classe mágica para quando clicarmos no botão */
     .sidebar.aberta {
-        left: 0; /* Desliza para dentro do ecrã! */
-        box-shadow: 2px 0 15px rgba(0,0,0,0.8);
+        left: 0; /* Volta para o ecrã */
     }
-
-    /* 3. Organiza o Cabeçalho */
-    .conteudo-principal {
-        padding-top: 15px; /* Espaço para não colar no topo */
-    }
-
-    .cabecalho-sistema {
-        display: flex;
-        flex-direction: column;
-    }
-
-    /* 4. Coloca Exportar e Nome no topo direito */
-    .acoes-topo {
-        position: absolute;
-        top: 15px;
-        right: 15px;
-        margin-bottom: 0;
-    }
-
-    .btn-acao { padding: 5px 10px; font-size: 12px; }
-    
-    /* 5. Empurra as Abas e Pesquisa para baixo das Ações */
-    .abas-navegacao { margin-top: 30px; overflow-x: auto; padding-bottom: 5px; }
-    
-    .area-pesquisa-filtros { flex-direction: column; }
-    .caixa-filtros { flex-direction: column; }
 }
