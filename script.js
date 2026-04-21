@@ -589,10 +589,31 @@ async function adicionarCategoria() {
 
 async function apagarCategoria(i) { 
     const cat = categorias[i]; 
-    if(confirm(`Deseja apagar a categoria "${cat}" para todos os utilizadores?`)) {
-        await fetch(`${API_URL}/categorias/${cat}`, { method: 'DELETE', headers: getAuthHeaders() });
-        await carregarDadosGlobais(); atualizarTabela(); atualizarPainelVencimentos();
-    }
+    
+    Swal.fire({
+        title: 'Tem a certeza?',
+        text: `Deseja apagar a categoria "${cat}" para todos os utilizadores?`,
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#d33',
+        cancelButtonColor: '#3085d6',
+        confirmButtonText: 'Sim, apagar!',
+        cancelButtonText: 'Cancelar',
+        background: configPrefs.escuro ? '#2d2d2d' : '#fff',
+        color: configPrefs.escuro ? '#fff' : '#333'
+    }).then(async (result) => {
+        if (result.isConfirmed) {
+            try {
+                await fetch(`${API_URL}/categorias/${cat}`, { method: 'DELETE', headers: getAuthHeaders() });
+                await carregarDadosGlobais(); 
+                atualizarTabela(); 
+                atualizarPainelVencimentos();
+                Swal.fire({ title: 'Apagado!', text: 'A categoria foi removida.', icon: 'success', timer: 1500, showConfirmButton: false, background: configPrefs.escuro ? '#2d2d2d' : '#fff', color: configPrefs.escuro ? '#fff' : '#333' });
+            } catch(e) {
+                Swal.fire('Erro!', 'Não foi possível apagar a categoria.', 'error');
+            }
+        }
+    });
 }
 
 async function adicionarSetor() { 
@@ -605,10 +626,29 @@ async function adicionarSetor() {
 
 async function apagarSetor(i) { 
     const set = setores[i]; 
-    if(confirm(`Deseja apagar o setor "${set}" para todos os utilizadores?`)) {
-        await fetch(`${API_URL}/setores/${set}`, { method: 'DELETE', headers: getAuthHeaders() });
-        await carregarDadosGlobais();
-    }
+    
+    Swal.fire({
+        title: 'Tem a certeza?',
+        text: `Deseja apagar o setor "${set}" para todos os utilizadores?`,
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#d33',
+        cancelButtonColor: '#3085d6',
+        confirmButtonText: 'Sim, apagar!',
+        cancelButtonText: 'Cancelar',
+        background: configPrefs.escuro ? '#2d2d2d' : '#fff',
+        color: configPrefs.escuro ? '#fff' : '#333'
+    }).then(async (result) => {
+        if (result.isConfirmed) {
+            try {
+                await fetch(`${API_URL}/setores/${set}`, { method: 'DELETE', headers: getAuthHeaders() });
+                await carregarDadosGlobais();
+                Swal.fire({ title: 'Apagado!', text: 'O setor foi removido.', icon: 'success', timer: 1500, showConfirmButton: false, background: configPrefs.escuro ? '#2d2d2d' : '#fff', color: configPrefs.escuro ? '#fff' : '#333' });
+            } catch(e) {
+                Swal.fire('Erro!', 'Não foi possível apagar o setor.', 'error');
+            }
+        }
+    });
 }
 
 function carregarImagemLocal(input) {
