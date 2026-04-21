@@ -209,3 +209,50 @@ th, td {
         display: none !important;
     }
 }
+
+/* ==========================================
+   MENU MOBILE & RESPONSIVIDADE
+========================================== */
+
+/* Esconde o botão no computador */
+.btn-menu-mobile {
+    display: none;
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    background-color: #3085d6;
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 60px;
+    height: 60px;
+    font-size: 28px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+    z-index: 9999;
+    cursor: pointer;
+    transition: background 0.3s;
+}
+
+/* Quando estiver num ecrã pequeno (Telemóvel) */
+@media (max-width: 768px) {
+    /* Mostra o botão flutuante */
+    .btn-menu-mobile {
+        display: block;
+    }
+
+    /* Esconde a barra lateral puxando-a para a esquerda */
+    .sidebar {
+        position: fixed;
+        left: -100%; /* Escondida fora do ecrã */
+        top: 0;
+        height: 100vh;
+        z-index: 9998;
+        transition: left 0.3s ease;
+        box-shadow: 2px 0 10px rgba(0,0,0,0.5);
+    }
+
+    /* Classe mágica para quando clicarmos no botão */
+    .sidebar.aberta {
+        left: 0; /* Volta para o ecrã */
+    }
+}
