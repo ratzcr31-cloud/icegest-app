@@ -15,6 +15,29 @@ let meuGraficoCategorias = null, meuGraficoBarras = null;
 let configEmEdicao = { tipo: '', index: -1, nomeAntigo: '' };
 let edicaoEmMassaIds = [];
 
+// ==========================================
+// CONTROLO DO MENU MOBILE
+// ==========================================
+const btnMenuMobile = document.getElementById('btnMenuMobile');
+const sidebar = document.querySelector('.sidebar');
+
+if (btnMenuMobile && sidebar) {
+    // Abrir/Fechar ao clicar no botão flutuante
+    btnMenuMobile.addEventListener('click', () => {
+        sidebar.classList.toggle('aberta');
+    });
+
+    // Fechar automaticamente a barra ao clicar num link do menu (para não ficar por cima do ecrã)
+    const linksMenu = sidebar.querySelectorAll('li, a, button'); // Ajusta se os teus botões do menu tiverem outras tags
+    linksMenu.forEach(link => {
+        link.addEventListener('click', () => {
+            if (window.innerWidth <= 768) {
+                sidebar.classList.remove('aberta');
+            }
+        });
+    });
+}
+
 const chatPadraoHTML = `<div style="background: var(--azul-claro); padding: 12px 15px; border-radius: 12px; align-self: flex-start; max-width: 85%; color: var(--texto); border-bottom-left-radius: 2px;"><b>Aurora ✨:</b> Olá! Sou a sua assistente pessoal. Diga-me o que quer atualizar ou envie as fotos das suas listas!</div>`;
 
 const DICIONARIO_ICONES = {
